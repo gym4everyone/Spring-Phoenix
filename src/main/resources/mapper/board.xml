@@ -3,64 +3,143 @@
  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.phoenix.board">
-<!--                   관리자 게시판                                  -->	
-		<insert id="fileInsert" parameterType="map">
-	 	INSERT INTO gym_file(file_no,qna_bno,review_bno,master_bno,
-	 						 board_type, file_path, file_name, file_type)
-	 	            values(gym_file_seq.NEXTVAL,#{qna_bno},#{review_bno},#{master_bno},
-	 	                   #{board_type}, #{file_path},#{file_name},#{file_type})
-	 	</insert>
- 	
-	 <select id="masterList" parameterType="map" resultType="map">
-		SELECT mb.master_bno, mb.mem_no, mb.master_title, mb.master_content,
-		       mb.master_date, mb.master_hit, mb.master_upddate, mb.master_deldate, mb.master_type,
-		       gf.file_no, gf.file_name, gf.file_type
-		FROM master_board mb LEFT JOIN GYM_FILE gf
-		    ON mb.master_bno = gf.master_bno
-		<if test='master_bno > 0'> <!-- 글 상세 조회 -->
-	    	WHERE mb.master_bno = #{master_bno}
-    	</if>    
-    	<if test='cb_search != null and cb_search.equals("master_title")'>
-			WHERE mb.master_title like '%'||#{tb_search}||'%'
-		</if>
-		<if test='cb_search != null and cb_search.equals("master_content")'>
-			WHERE mb.master_content like '%'||#{tb_search}||'%'
-		</if>
-	 ORDER BY master_bno desc
-	</select>
 
-	<select id="masterDetail" parameterType="map" resultType="map">
-	 	select 	master_title, master_content, master_date, 
-	 		   	master_upddate, master_deldate, master_hit, file_name
-	    From 	master_board mb left join gym_file gf
-	    		on mb.master_bno = gf.master_bno 
-		WHERE 	mb.master_bno = #{master_bno}
+	<!-- ===================================[MASTER_BOARD]======================================= -->
+	<select id="mBoardList" parameterType="map" resultType="map">
+		SELECT
+		     MASTER_TITLE, MASTER_HIT, MEM_NAME, MASTER_DATE, MASTER_BNO  
+		FROM
+		    MASTER_BOARD a LEFT JOIN MEMBER b ON(a.MEM_NO = b.MEM_NO)
+		WHERE
+			<choose>
+				<when test='id.equals("notice")'>
+					MASTER_TYPE=0
+				</when>
+				<when test='id.equals("ask")'>
+					MASTER_TYPE=1
+				</when>
+			</choose>
+		AND MASTER_DELDATE = '0'
+		ORDER BY MASTER_BNO DESC
 	</select>
-
-	<insert id="masterInsert" parameterType="map">
-		INSERT INTO master_board
-		(master_bno, mem_no, master_title, master_content, master_date,
-		 master_hit, master_upddate, master_deldate, master_type)
-		values(master_board_seq.NEXTVAL, #{mem_no}, #{master_title}, #{master_content}
-		,TO_CHAR(SYSDATE, 'yyyy-mm-dd hh24:mm:ss'), 0,0,0, #{master_type} 
+	
+	<select id="mBoardDetail" parameterType="map" resultType="map">
+		SELECT
+		     MASTER_TITLE, MASTER_CONTENT, MASTER_HIT, MEM_NAME, MASTER_DATE, MASTER_BNO  
+		FROM
+		    MASTER_BOARD a LEFT JOIN MEMBER b ON(a.MEM_NO = b.MEM_NO)
+		WHERE
+			MASTER_BNO=#{bno}
+	</select>
+		
+	<insert id="mBoardInsert" parameterType="map" useGeneratedKeys="true" keyColumn="MASTER_BNO" keyProperty="master_bno">
+		INSERT INTO 			
+			MASTER_BOARD 
+		(master_bno, mem_no, master_title, master_content, master_type)
+		values(
+			master_board_seq.nextval , #{mem_no}, #{title}, #{content},
+			<choose>
+				<when test='id.equals("notice")'>
+					0
+				</when>
+				<when test='id.equals("ask")'>
+					1
+				</when>
+			</choose>
 		)
 	</insert>
 	
-	<update id="masterUpdate" parameterType="map">
-		UPDATE master_board SET
-		master_title = #{master_title},
-		master_content = #{master_content},
-		master_upddate= TO_CHAR(SYSDATE,'yyyy-mm-dd hh24:mm:ss'),
-		master_type=#{master_type}
-		where master_bno = #{master_bno}
+	<update id="mBoardUpdate" parameterType="map">
+		UPDATE 		
+			MASTER_BOARD 
+		SET
+			master_title = #{title},
+			master_content = #{content},
+			MASTER_UPDDATE = TO_CHAR(sysdate, 'YYYY-MM-DD HH24:MI:SS')
+		where 
+			MASTER_BNO = #{bno}
 	</update>
 	
-	<update id="masterDelete" parameterType="map">
-		UPDATE master_board SET 
-	 		master_deldate= TO_CHAR(SYSDATE, 'yyyy-mm-dd hh24:mm:ss') 
-		WHERE master_bno = #{master_bno}
+	<update id="mBoardDelete" parameterType="map">
+		UPDATE 
+				MASTER_BOARD 
+			SET
+				MASTER_DELDATE = TO_CHAR(sysdate, 'YYYY-MM-DD HH24:MI:SS')
+			where 
+				MASTER_BNO = #{bno}
 	</update>
+	<!-- ========================================[FILE]============================================ -->
 
+	<select id="fileList" parameterType="map" resultType="map">
+		SELECT
+			FILE_NAME
+		FROM
+		    GYM_FILE 
+		WHERE
+			<choose>
+				<when test='id.equals("notice") or id.equals("ask")'>
+					MASTER_BNO=#{bno}
+				</when>
+				<when test='id.equals("inquire")'>
+					QNA_BNO=#{bno}
+				</when>
+				<when test='id.equals("review")'>
+					REVIEW_BNO=#{bno}
+				</when>
+			</choose>
+		AND BOARD_TYPE != -1	
+	</select>
+	
+	
+	<insert id="fileInsert" parameterType="map">
+		INSERT INTO 
+			gym_file
+			(file_no, file_path, file_name, file_size)
+		values
+			(gym_file_seq.nextval, #{path}, #{name}, #{size})
+	</insert>
+	
+	<update id="fileUpdate" parameterType="list">
+		<foreach collection="list" item="item" separator=";" open="DECLARE BEGIN" close="; END;">
+			UPDATE 
+				gym_file
+			SET
+				<choose>
+					<when test='item.id.equals("notice") or item.id.equals("ask")'>
+						MASTER_BNO=#{item.bno}
+					</when>
+					<when test='item.id.equals("inquire")'>
+						QNA_BNO=#{item.bno}
+					</when>
+					<when test='item.id.equals("review")'>
+						REVIEW_BNO=#{item.bno}
+					</when>
+				</choose>
+			where 
+				file_name = #{item.name}
+		</foreach>
+	</update>
+	
+	
+	
+	<update id="fileDelete" parameterType="map">
+		UPDATE 
+			gym_file
+		SET
+			BOARD_TYPE = -1
+		where 
+			<choose>
+				<when test='item.id.equals("notice") or item.id.equals("ask")'>
+					MASTER_BNO=#{item.bno}
+				</when>
+				<when test='item.id.equals("inquire")'>
+					QNA_BNO=#{item.bno}
+				</when>
+				<when test='item.id.equals("review")'>
+					REVIEW_BNO=#{item.bno}
+				</when>
+			</choose>
+	</update>
 
 <!--                   1:1질문 게시판                                  -->	
 	<select id="qnaList" parameterType="map" resultType="map">
@@ -401,6 +480,4 @@
 		UPDATE qna_board SET qna_hit = qna_hit+1
 		WHERE qna_bno = #{qna_bno}
 	</update> 
-	
-	
 </mapper>

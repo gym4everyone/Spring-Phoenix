@@ -16,6 +16,140 @@ public class BoardDao {
 	@Autowired
 	private SqlSession sqlSession = null;
 	
+	public List<Map<String, Object>> boardList(Map<String, Object> pMap) {
+
+		logger.info("boardList 호출성공");
+
+		List<Map<String, Object>> list = null;
+		try {
+			list = sqlSession.selectList(NAMESPACE + "mBoardList", pMap);
+			logger.info(list);
+		} catch (Exception e) {
+			logger.info("Exection => " + e.toString());
+		}
+		return list;
+	}
+
+	public int boardInsert(Map<String, Object> pMap) {
+
+		logger.info("boardInsert 호출성공");
+		logger.info(pMap);
+		int result = -99;
+
+		try {
+			result = sqlSession.insert(NAMESPACE + "mBoardInsert", pMap);
+			logger.info(pMap.get("master_bno"));
+		} catch (Exception e) {
+			logger.info("Exection => " + e.toString());
+		}
+		return result;
+	}
+	
+	public int boardUpdate(Map<String, Object> map) {
+		logger.info("boardUpdate 호출성공");
+		int result = 0;
+
+		try {
+			result = sqlSession.update(NAMESPACE + "mBoardUpdate", map);
+			logger.info(result);
+		} catch (Exception e) {
+			logger.info("Exection => " + e.toString());
+		}
+		return result;
+	}
+	
+	
+	
+	public List<Map<String, Object>> boardDetail(Map<String, Object> pMap) {
+		logger.info("boardDetail 호출성공", pMap);
+
+		List<Map<String, Object>> list = null;
+		try {
+			list = sqlSession.selectList(NAMESPACE + "mBoardDetail", pMap);
+			logger.info(list);
+		} catch (Exception e) {
+			logger.info("Exection => " + e.toString());
+		}
+		return list;
+	}
+	
+
+	public int boardDelete(Map<String, Object> map) {
+		logger.info("boardDelete 호출성공");
+		int result = 0;
+
+		try {
+			result = sqlSession.update(NAMESPACE + "mBoardDelete", map);
+			logger.info(result);
+		} catch (Exception e) {
+			logger.info("Exection => " + e.toString());
+		}
+		return result;
+	}
+
+	
+	
+	//=====================================================================
+
+	public int fileInsert(Map<String, Object> pMap) {
+		
+		logger.info("fileInsert 호출성공");
+		int result = 0;
+
+		try {
+			result = sqlSession.insert(NAMESPACE + "fileInsert", pMap);
+			logger.info(result);
+		} catch (Exception e) {
+			logger.info("Exection => " + e.toString());
+		}
+		return result;
+	}
+
+	public int fileUpdate(List<Map<String, Object>> pList) {
+		
+		logger.info("fileUpdate 호출성공");
+		logger.info(pList);
+		int result = 0;
+
+		try {
+			result = sqlSession.update(NAMESPACE + "fileUpdate", pList);
+			logger.info(result);
+		} catch (Exception e) {
+			logger.info("Exection => " + e.toString());
+		}
+		return result;
+	}
+
+
+	public List<Map<String, Object>> fileList(Map<String, Object> pMap) {
+		logger.info("fileList 호출성공");
+
+		List<Map<String, Object>> list = null;
+		try {
+			list = sqlSession.selectList(NAMESPACE + "fileList", pMap);
+			logger.info(list);
+		} catch (Exception e) {
+			logger.info("Exection => " + e.toString());
+		}
+		return list;
+	}
+
+
+	public int fileDelete(Map<String, Object> map) {
+		logger.info("fileDelete 호출성공");
+		int result = 0;
+
+		try {
+			result = sqlSession.update(NAMESPACE + "fileDelete", map);
+			logger.info(result);
+		} catch (Exception e) {
+			logger.info("Exection => " + e.toString());
+		}
+		return result;
+	}
+	
+	
+	/*
 	public List<Map<String, Object>> masterList(Map<String, Object> pMap) {
 		logger.info("masterList 호출성공");
 
@@ -72,6 +206,7 @@ public class BoardDao {
 		}
 		return result;
 	}
+	*/
 	
 	public List<Map<String, Object>> qnaList(Map<String, Object> pMap) {
 		logger.info("qnaList 호출성공");
@@ -433,18 +568,6 @@ public class BoardDao {
 		return result;
 	}
 
-	public int fileInsert(Map<String, Object> pMap) {
-		logger.info("Dao fileInsert 호출성공");
-		int result = 0;
-		
-		try {
-			result = sqlSession.insert(NAMESPACE + "fileInsert", pMap);
-			logger.info(result);
-		} catch (Exception e) {
-			logger.info("Exection => " + e.toString());
-		}
-		return result;
-	}
 	
 	public int transBHitUpdate(int transB_bno) {
 		logger.info("transBHitUpdate 호출성공");

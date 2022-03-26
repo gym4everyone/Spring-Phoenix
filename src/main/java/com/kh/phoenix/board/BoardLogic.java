@@ -15,7 +15,50 @@ public class BoardLogic {
 	Logger logger = LogManager.getLogger(BoardLogic.class);
 	@Autowired
 	private BoardDao boardDao = null;
+	
+	public List<Map<String, Object>> boardList(Map<String, Object> pMap) {
+		List<Map<String, Object>> list = null;
+		list = boardDao.boardList(pMap);
+		return list;
+	}
 
+	public int boardInsert(Map<String, Object> pMap) {
+		int result = 0;
+		result = boardDao.boardInsert(pMap);
+		return result;
+	}
+	
+
+	public int fileUpdate(List<Map<String, Object>> pList) {
+		return boardDao.fileUpdate(pList);
+	}
+
+	public int fileInsert(Map<String, Object> pMap) {
+		return boardDao.fileInsert(pMap);
+	}
+
+	public List<Map<String, Object>> boardDetail(Map<String, Object> pMap) {
+		return boardDao.boardDetail(pMap);
+	}
+
+	public List<Map<String, Object>> fileList(Map<String, Object> pMap) {
+		return boardDao.fileList(pMap);
+	}
+
+	public int boardUpdate(Map<String, Object> map) {
+		return boardDao.boardUpdate(map);
+	}
+
+	public int fileDelete(Map<String, Object> map) {
+		return boardDao.fileDelete(map);
+	}
+
+	public int boardDelete(Map<String, Object> map) {
+		return boardDao.boardDelete(map);
+	}
+	
+
+	/*
 	public List<Map<String, Object>> masterList(Map<String, Object> pMap) {
 		List<Map<String, Object>> list = null;
 		list = boardDao.masterList(pMap);
@@ -47,6 +90,7 @@ public class BoardLogic {
 		result = boardDao.masterDelete(pMap);
 		return result;
 	}
+	*/
 	
 	public List<Map<String, Object>> qnaList(Map<String, Object> pMap) {
 		List<Map<String, Object>> list = null;
@@ -234,13 +278,6 @@ public class BoardLogic {
 		list = boardDao.myBoardList(pMap);
 		return list;
 	}
-
-	public int fileInsert(Map<String, Object> pMap) {
-		int result = 0;
-		result = boardDao.fileInsert(pMap);
-		return result;
-	}
-	
 
 	
 }
